@@ -6,7 +6,7 @@ pipeline {
         //Parar todos los servicios
         stage('Parando todos los servicios'){
             steps {
-                sh '''
+                bat '''
                     docker compose -p adj-demo-c down || true
                 '''
             }
@@ -16,7 +16,7 @@ pipeline {
         //Eliminar las imagenes anteriores
         stage('Eliminando imagenes antiguas'){
             steps {
-                sh '''
+                bat '''
                     IMAGES=$(docker images --filter "label=com.docker.compose.project=adj-demo-c" -q)
                     if [ -n '$IMAGES' ]; then
                         docker images rmi $IMAGES
@@ -38,7 +38,7 @@ pipeline {
         //Levantar y desplegar el proyecto
         stage('Construyendo y desplegando...'){
             steps {
-                sh '''
+                bat '''
                     docker compose up --build -d
                 '''
             }

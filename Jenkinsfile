@@ -1,19 +1,17 @@
 pipeline {
     agent any
 
-    
     stages {
-        //Parar todos los servicios
-        stage('Parando todos los servicios'){
+        // Parar los servicios que ya existen o en todo caso hacer caso omiso
+        stage('Parando los servicios...') {
             steps {
                 bat '''
-                    docker compose -p adj-demo-c down || true
+                    docker compose -p adj-demo-c down || exit /b 0
                 '''
             }
-        
-    }
+        }
 
-// Eliminar las imágenes creadas por ese proyecto
+        // Eliminar las imágenes creadas por ese proyecto
         stage('Eliminando imágenes anteriores...') {
             steps {
                 bat '''
@@ -28,37 +26,35 @@ pipeline {
                 '''
             }
         }
-        //Bajar la actualizacion
-        stage('Actualizando...'){
-            steps{
+
+        // Del recurso SCM configurado en el job, jala el repo
+        stage('Obteniendo actualización...') {
+            steps {
                 checkout scm
             }
         }
 
-
-        //Levantar y desplegar el proyecto
-        stage('Construyendo y desplegando...'){
+        // Construir y levantar los servicios
+        stage('Construyendo y desplegando servicios...') {
             steps {
                 bat '''
                     docker compose up --build -d
                 '''
             }
-
         }
     }
 
-
     post {
         success {
-            echo 'Pipeline ejecutado exitosamente.'
+            echo 'Pipeline ejecutado con éxito'
         }
 
         failure {
-            echo 'Error al ejecutar el pipeline.'
+            echo 'Hubo un error al ejecutar el pipeline'
         }
 
         always {
-            echo 'Pipeline finalizado.'
+            echo 'Pipeline finalizado'
         }
     }
 }

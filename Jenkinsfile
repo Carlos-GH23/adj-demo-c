@@ -13,18 +13,19 @@ pipeline {
         
     }
 
-        //Eliminar las imagenes anteriores
-        stage('Eliminando imagenes antiguas'){
+// Eliminar las imágenes creadas por ese proyecto
+        stage('Eliminando imágenes anteriores...') {
             steps {
                 bat '''
-                    IMAGES=$(docker images --filter "label=com.docker.compose.project=adj-demo-c" -q)
-                    if [ -n '$IMAGES' ]; then
-                        docker images rmi $IMAGES
-                    else
-                        echo "No hay imagenes por borrar"
-                    fi
+                    for /f "tokens=*" %%i in ('docker images --filter "label=com.docker.compose.project=adj-demo-c" -q') do (
+                        docker rmi -f %%i
+                    )
+                    if errorlevel 1 (
+                        echo No hay imagenes por eliminar
+                    ) else (
+                        echo Imagenes eliminadas correctamente
+                    )
                 '''
-            
             }
         }
         //Bajar la actualizacion
